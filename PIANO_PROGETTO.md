@@ -25,7 +25,7 @@ Trasforma dati biometrici e visivi in indicatori di rischio immediati, facendo d
 | Navigazione | React Navigation | Gestione schermate |
 | Autenticazione | Firebase Auth | Login email/password |
 | File/Foto | Firebase Storage | Salvataggio foto e audio |
-| Report | react-native-pdf | Generazione PDF |
+| Report | react-native-html-to-pdf | Generazione PDF |
 | Notifiche | Expo Notifications | Push notifications |
 | Lingue | i18n | Italiano + Inglese |
 
@@ -285,14 +285,16 @@ Sagoma stilizzata testa cavallo + onda sinusoidale (battito cardiaco) che attrav
 - Cambio marca di mangime (Sì/No)
 - Spostamento di box/scuderia
 
-**Alert Chetoni (Punteggio cumulativo):**
+**Alert Chetoni (Iperlipemia / Bilancio Energetico Negativo):**
 ```
-Rischio = Peso_BCS + Fattore_Sesso + StressorAlimentare
+Rischio = Fattore_BCS_Inverso + Fattore_Sesso + StressorAlimentare
+Dove: BCS basso (1-3) = rischio alto, BCS alto (7-9) = rischio basso
 ```
-- BCS 7-9: alto rischio (il grasso è la "benzina" per i chetoni)
-- Femmina gravida/lattante: rischio raddoppiato
-- Pony/Muli: metabolismo grassi più aggressivo
-- Trigger: il cavallo smette di mangiare o ha una colica → alert immediato
+- BCS 1-3: **alto rischio** (poche riserve → il corpo mobilizza grassi rapidamente → produzione chetoni)
+- BCS 7-9: rischio basso (più riserve energetiche disponibili)
+- Femmina gravida/lattante: rischio raddoppiato (fabbisogno energetico elevato)
+- Pony/Muli: metabolismo grassi più aggressivo, predisposti a iperlipemia
+- Trigger: il cavallo smette di mangiare o ha una colica → alert immediato (bilancio energetico negativo)
 
 **Alert Acidosi (Cambio Dieta):**
 - Periodo critico: **primi 5-7 giorni** dopo un cambio

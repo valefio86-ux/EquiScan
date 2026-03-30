@@ -375,12 +375,12 @@ Ogni fase viene completata e testata prima di passare alla successiva.
 
 ---
 
-### FASE 1 — Autenticazione
-- [ ] Step 1.1: Schermata di Registrazione (email + password)
-- [ ] Step 1.2: Schermata di Login
-- [ ] Step 1.3: Funzione "Password dimenticata"
-- [ ] Step 1.4: Protezione delle schermate (solo utenti loggati)
-- [ ] Step 1.5: Pulsante Logout
+### FASE 1 — Autenticazione ✅
+- [x] Step 1.1: Schermata di Registrazione (email + password)
+- [x] Step 1.2: Schermata di Login
+- [x] Step 1.3: Funzione "Password dimenticata"
+- [x] Step 1.4: Protezione delle schermate (solo utenti loggati)
+- [x] Step 1.5: Pulsante Logout
 - [ ] 🧪 **TEST:** Registrazione, login, logout, recupero password
 
 ---

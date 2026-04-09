@@ -18,6 +18,9 @@
         "backgroundColor": "#2E7D32"
       },
       "package": "com.equiscan.app"
-    }
+    },
+    "plugins": [
+      "expo-asset"
+    ]
   }
 }

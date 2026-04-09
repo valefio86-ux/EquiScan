@@ -17,9 +17,13 @@ export default function LoginScreen({ navigation }) {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const showAlert = (title, msg) => {
+    if (Platform.OS === 'web') { window.alert(msg); } else { Alert.alert(title, msg); }
+  };
+
   const handleLogin = async () => {
     if (!email || !password) {
-      Alert.alert('Errore', 'Compila tutti i campi.');
+      showAlert('Errore', 'Compila tutti i campi.');
       return;
     }
 
@@ -36,7 +40,7 @@ export default function LoginScreen({ navigation }) {
       } else if (error.code === 'auth/too-many-requests') {
         message = 'Troppi tentativi. Riprova tra qualche minuto.';
       }
-      Alert.alert('Errore', message);
+      showAlert('Errore', message);
     } finally {
       setLoading(false);
     }

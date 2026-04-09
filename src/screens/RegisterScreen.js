@@ -18,17 +18,21 @@ export default function RegisterScreen({ navigation }) {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const showAlert = (title, msg) => {
+    if (Platform.OS === 'web') { window.alert(msg); } else { Alert.alert(title, msg); }
+  };
+
   const handleRegister = async () => {
     if (!email || !password || !confirmPassword) {
-      Alert.alert('Errore', 'Compila tutti i campi.');
+      showAlert('Errore', 'Compila tutti i campi.');
       return;
     }
     if (password.length < 6) {
-      Alert.alert('Errore', 'La password deve avere almeno 6 caratteri.');
+      showAlert('Errore', 'La password deve avere almeno 6 caratteri.');
       return;
     }
     if (password !== confirmPassword) {
-      Alert.alert('Errore', 'Le password non corrispondono.');
+      showAlert('Errore', 'Le password non corrispondono.');
       return;
     }
 
@@ -43,7 +47,7 @@ export default function RegisterScreen({ navigation }) {
       } else if (error.code === 'auth/invalid-email') {
         message = 'Indirizzo email non valido.';
       }
-      Alert.alert('Errore', message);
+      showAlert('Errore', message);
     } finally {
       setLoading(false);
     }

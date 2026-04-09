@@ -16,26 +16,30 @@ export default function ForgotPasswordScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const showAlert = (title, msg, onOk) => {
+    if (Platform.OS === 'web') { window.alert(msg); if (onOk) onOk(); } else { Alert.alert(title, msg, onOk ? [{ text: 'OK', onPress: onOk }] : undefined); }
+  };
+
   const handleReset = async () => {
     if (!email) {
-      Alert.alert('Errore', 'Inserisci la tua email.');
+      showAlert('Errore', 'Inserisci la tua email.');
       return;
     }
 
     setLoading(true);
     try {
       await sendPasswordResetEmail(auth, email.trim());
-      Alert.alert(
+      showAlert(
         'Email inviata',
         'Controlla la tua casella di posta. Ti abbiamo inviato un link per reimpostare la password.',
-        [{ text: 'OK', onPress: () => navigation.goBack() }]
+        () => navigation.goBack()
       );
     } catch (error) {
       let message = 'Errore durante l\'invio.';
       if (error.code === 'auth/invalid-email') {
         message = 'Indirizzo email non valido.';
       }
-      Alert.alert('Errore', message);
+      showAlert('Errore', message);
     } finally {
       setLoading(false);
     }

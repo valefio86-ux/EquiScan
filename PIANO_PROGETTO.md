@@ -421,13 +421,13 @@ Ogni fase viene completata e testata prima di passare alla successiva.
 ---
 
 ### FASE 5 — BCS Interattivo
-- [ ] Step 5.1: Sagoma cavallo con 6 zone cliccabili
-- [ ] Step 5.2: Domande guidate per ogni zona
-- [ ] Step 5.3: Immagini di riferimento per ogni zona
-- [ ] Step 5.4: Calcolo punteggio Henneke (media delle 6 zone)
-- [ ] Step 5.5: Salvataggio su Firestore + alert metabolico (BCS 8-9)
-- [ ] Step 5.6: Storico BCS
-- [ ] 🧪 **TEST:** Completare una valutazione, verificare punteggio e alert
+- [x] Step 5.1: Sagoma cavallo con 6 zone cliccabili
+- [x] Step 5.2: Domande guidate per ogni zona
+- [x] Step 5.3: Immagini di riferimento per ogni zona
+- [x] Step 5.4: Calcolo punteggio Henneke (media delle 6 zone)
+- [x] Step 5.5: Salvataggio su Firestore + alert metabolico (BCS 8-9)
+- [x] Step 5.6: Storico BCS
+- [x] 🧪 **TEST:** Completare una valutazione, verificare punteggio e alert
 
 ---
 

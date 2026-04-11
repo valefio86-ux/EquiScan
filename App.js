@@ -8,7 +8,10 @@ import { COLORS } from './src/theme/colors';
 import LoginScreen from './src/screens/LoginScreen';
 import RegisterScreen from './src/screens/RegisterScreen';
 import ForgotPasswordScreen from './src/screens/ForgotPasswordScreen';
-import HomeScreen from './src/screens/HomeScreen';
+import HorseListScreen from './src/screens/HorseListScreen';
+import AddHorseScreen from './src/screens/AddHorseScreen';
+import HorseDetailScreen from './src/screens/HorseDetailScreen';
+import EditHorseScreen from './src/screens/EditHorseScreen';
 
 const AuthStack = createNativeStackNavigator();
 const AppStack = createNativeStackNavigator();
@@ -26,7 +29,10 @@ function AuthNavigator() {
 function AppNavigator() {
   return (
     <AppStack.Navigator screenOptions={{ headerStyle: { backgroundColor: COLORS.primary }, headerTintColor: COLORS.white, headerTitleStyle: { fontWeight: 'bold' } }}>
-      <AppStack.Screen name="Home" component={HomeScreen} options={{ title: 'EquiScan' }} />
+      <AppStack.Screen name="HorseList" component={HorseListScreen} options={{ title: 'I miei Cavalli' }} />
+      <AppStack.Screen name="AddHorse" component={AddHorseScreen} options={{ title: 'Nuovo Cavallo' }} />
+      <AppStack.Screen name="HorseDetail" component={HorseDetailScreen} options={{ title: 'Dettaglio Cavallo' }} />
+      <AppStack.Screen name="EditHorse" component={EditHorseScreen} options={{ title: 'Modifica Cavallo' }} />
     </AppStack.Navigator>
   );
 }

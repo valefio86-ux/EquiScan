@@ -10,11 +10,11 @@ import HealthGauge from '../components/HealthGauge';
 
 // Moduli che verranno implementati nelle fasi successive
 const MODULES = [
-  { key: 'heart', icon: '❤️', title: 'Battito Cardiaco', unit: 'BPM', phase: 4 },
-  { key: 'bcs', icon: '⚖️', title: 'Body Condition', unit: '/9', phase: 5 },
-  { key: 'pain', icon: '😣', title: 'Scala Dolore', unit: '/12', phase: 6 },
-  { key: 'gut', icon: '🔊', title: 'Borborigmi', unit: '/12', phase: 7 },
-  { key: 'diet', icon: '🥕', title: 'Dieta', unit: '', phase: 8 },
+  { key: 'heart', icon: '❤️', title: 'Battito Cardiaco', unit: 'BPM', phase: 4, screen: 'HeartRate' },
+  { key: 'bcs', icon: '⚖️', title: 'Body Condition', unit: '/9', phase: 5, screen: null },
+  { key: 'pain', icon: '😣', title: 'Scala Dolore', unit: '/12', phase: 6, screen: null },
+  { key: 'gut', icon: '🔊', title: 'Borborigmi', unit: '/12', phase: 7, screen: null },
+  { key: 'diet', icon: '🥕', title: 'Dieta', unit: '', phase: 8, screen: null },
 ];
 
 export default function DashboardScreen({ route, navigation }) {
@@ -62,7 +62,12 @@ export default function DashboardScreen({ route, navigation }) {
       <Text style={styles.sectionTitle}>Parametri</Text>
       <View style={styles.cardsGrid}>
         {MODULES.map((mod) => (
-          <TouchableOpacity key={mod.key} style={styles.card} activeOpacity={0.7}>
+          <TouchableOpacity
+            key={mod.key}
+            style={[styles.card, mod.screen && styles.cardActive]}
+            activeOpacity={0.7}
+            onPress={() => mod.screen && navigation.navigate(mod.screen, { horseId: horse.id })}
+          >
             <Text style={styles.cardIcon}>{mod.icon}</Text>
             <Text style={styles.cardTitle}>{mod.title}</Text>
             <Text style={styles.cardValue}>—</Text>
@@ -99,6 +104,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.1, shadowRadius: 4,
   },
+  cardActive: { borderWidth: 1, borderColor: COLORS.primary },
   cardIcon: { fontSize: 28, marginBottom: 6 },
   cardTitle: { fontSize: 13, fontWeight: '600', color: COLORS.text, marginBottom: 4, textAlign: 'center' },
   cardValue: { fontSize: 22, fontWeight: 'bold', color: COLORS.textLight, marginBottom: 2 },

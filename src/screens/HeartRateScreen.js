@@ -5,6 +5,7 @@ import {
 } from 'react-native';
 import { collection, addDoc, query, where, orderBy, limit, getDocs, serverTimestamp } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
+import { useAuth } from '../context/AuthContext';
 import { COLORS } from '../theme/colors';
 
 const TIMER_SECONDS = 15;
@@ -33,6 +34,7 @@ function getAlertLevel(bpm) {
 
 export default function HeartRateScreen({ route, navigation }) {
   const { horseId } = route.params;
+  const { user } = useAuth();
   const [phase, setPhase] = useState('instructions');
   const [timeLeft, setTimeLeft] = useState(TIMER_SECONDS);
   const [tapCount, setTapCount] = useState(0);
@@ -84,6 +86,7 @@ export default function HeartRateScreen({ route, navigation }) {
     try {
       await addDoc(collection(db, 'heartRateMeasurements'), {
         horseId,
+        userId: user.uid,
         bpm: bpmValue,
         tapCount,
         timerSeconds: TIMER_SECONDS,

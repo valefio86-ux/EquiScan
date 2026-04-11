@@ -12,6 +12,7 @@ import HorseListScreen from './src/screens/HorseListScreen';
 import AddHorseScreen from './src/screens/AddHorseScreen';
 import HorseDetailScreen from './src/screens/HorseDetailScreen';
 import EditHorseScreen from './src/screens/EditHorseScreen';
+import DashboardScreen from './src/screens/DashboardScreen';
 
 const AuthStack = createNativeStackNavigator();
 const AppStack = createNativeStackNavigator();
@@ -31,7 +32,8 @@ function AppNavigator() {
     <AppStack.Navigator screenOptions={{ headerStyle: { backgroundColor: COLORS.primary }, headerTintColor: COLORS.white, headerTitleStyle: { fontWeight: 'bold' } }}>
       <AppStack.Screen name="HorseList" component={HorseListScreen} options={{ title: 'I miei Cavalli' }} />
       <AppStack.Screen name="AddHorse" component={AddHorseScreen} options={{ title: 'Nuovo Cavallo' }} />
-      <AppStack.Screen name="HorseDetail" component={HorseDetailScreen} options={{ title: 'Dettaglio Cavallo' }} />
+      <AppStack.Screen name="Dashboard" component={DashboardScreen} options={{ title: 'Dashboard' }} />
+      <AppStack.Screen name="HorseDetail" component={HorseDetailScreen} options={{ title: 'Profilo Cavallo' }} />
       <AppStack.Screen name="EditHorse" component={EditHorseScreen} options={{ title: 'Modifica Cavallo' }} />
     </AppStack.Navigator>
   );

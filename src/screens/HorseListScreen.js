@@ -60,7 +60,7 @@ export default function HorseListScreen({ navigation }) {
   const renderHorse = ({ item }) => (
     <TouchableOpacity
       style={styles.card}
-      onPress={() => navigation.navigate('HorseDetail', { horseId: item.id })}
+      onPress={() => navigation.navigate('Dashboard', { horseId: item.id })}
     >
       <View style={styles.cardContent}>
         <Text style={styles.horseName}>{item.name}</Text>

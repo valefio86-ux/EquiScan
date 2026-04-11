@@ -17,6 +17,8 @@ import HeartRateScreen from './src/screens/HeartRateScreen';
 import HeartRateHistoryScreen from './src/screens/HeartRateHistoryScreen';
 import BCSScreen from './src/screens/BCSScreen';
 import BCSHistoryScreen from './src/screens/BCSHistoryScreen';
+import HGSScreen from './src/screens/HGSScreen';
+import HGSHistoryScreen from './src/screens/HGSHistoryScreen';
 
 const AuthStack = createNativeStackNavigator();
 const AppStack = createNativeStackNavigator();
@@ -43,6 +45,8 @@ function AppNavigator() {
       <AppStack.Screen name="HeartRateHistory" component={HeartRateHistoryScreen} options={{ title: 'Storico Battito' }} />
       <AppStack.Screen name="BCS" component={BCSScreen} options={{ title: 'Body Condition Score' }} />
       <AppStack.Screen name="BCSHistory" component={BCSHistoryScreen} options={{ title: 'Storico BCS' }} />
+      <AppStack.Screen name="HGS" component={HGSScreen} options={{ title: 'Scala Dolore (HGS)' }} />
+      <AppStack.Screen name="HGSHistory" component={HGSHistoryScreen} options={{ title: 'Storico HGS' }} />
     </AppStack.Navigator>
   );
 }

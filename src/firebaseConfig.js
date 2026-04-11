@@ -4,6 +4,7 @@
 
 import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
+import { getStorage } from 'firebase/storage';
 import { Platform } from 'react-native';
 
 const firebaseConfig = {
@@ -21,6 +22,9 @@ const app = initializeApp(firebaseConfig);
 // Avvia Firestore (il database dove salveremo i dati dei cavalli)
 const db = getFirestore(app);
 
+// Avvia Storage (per foto e file)
+const storage = getStorage(app);
+
 // Avvia Auth con persistenza appropriata per la piattaforma
 let auth;
 if (Platform.OS === 'web') {
@@ -34,4 +38,4 @@ if (Platform.OS === 'web') {
   });
 }
 
-export { db, auth };
+export { db, auth, storage };

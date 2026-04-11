@@ -432,14 +432,14 @@ Ogni fase viene completata e testata prima di passare alla successiva.
 ---
 
 ### FASE 6 — Horse Grimace Scale
-- [ ] Step 6.1: Guida scatto foto (istruzioni posizionamento)
-- [ ] Step 6.2: Cattura foto con fotocamera del telefono
-- [ ] Step 6.3: Visualizzazione foto + checklist 6 Action Units
-- [ ] Step 6.4: Immagini di riferimento (punteggio 0, 1, 2 per ogni AU)
-- [ ] Step 6.5: Calcolo punteggio totale + alert (Verde/Giallo/Rosso)
-- [ ] Step 6.6: Salvataggio foto su Firebase Storage + punteggio su Firestore
-- [ ] Step 6.7: Storico valutazioni HGS
-- [ ] 🧪 **TEST:** Scattare foto, completare checklist, verificare salvataggio e alert
+- [x] Step 6.1: Guida scatto foto (istruzioni posizionamento)
+- [x] Step 6.2: Cattura foto con fotocamera del telefono
+- [x] Step 6.3: Visualizzazione foto + checklist 6 Action Units
+- [x] Step 6.4: Immagini di riferimento (punteggio 0, 1, 2 per ogni AU)
+- [x] Step 6.5: Calcolo punteggio totale + alert (Verde/Giallo/Rosso)
+- [x] Step 6.6: Salvataggio foto su Firebase Storage + punteggio su Firestore
+- [x] Step 6.7: Storico valutazioni HGS
+- [x] 🧪 **TEST:** Scattare foto, completare checklist, verificare salvataggio e alert
 
 ---
 

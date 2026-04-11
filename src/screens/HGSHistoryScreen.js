@@ -10,17 +10,29 @@ import { COLORS } from '../theme/colors';
 
 const CHART_HEIGHT = 200;
 const CHART_PADDING = 40;
-const MIN_BPM = 0;
-const MAX_BPM = 80;
 
-function getAlertColor(bpm) {
-  if (bpm >= 28 && bpm <= 44) return COLORS.success;
-  if ((bpm >= 20 && bpm < 28) || (bpm > 44 && bpm <= 52)) return COLORS.warning;
-  if ((bpm >= 12 && bpm < 20) || (bpm > 52 && bpm <= 64)) return '#FF9800';
+const AU_LABELS = {
+  ears: 'Orecchie',
+  eye: 'Occhio',
+  orbital: 'Area Sopraorbitale',
+  nostrils: 'Narici',
+  mouth: 'Bocca',
+  profile: 'Profilo',
+};
+
+function getAlertColor(score) {
+  if (score <= 2) return COLORS.success;
+  if (score <= 5) return COLORS.warning;
   return COLORS.error;
 }
 
-export default function HeartRateHistoryScreen({ route }) {
+function getAlertLabel(score) {
+  if (score <= 2) return 'Dolore nullo/lieve';
+  if (score <= 5) return 'Dolore moderato';
+  return 'Dolore significativo';
+}
+
+export default function HGSHistoryScreen({ route }) {
   const { horseId } = route.params;
   const { user } = useAuth();
   const [measurements, setMeasurements] = useState([]);
@@ -31,7 +43,7 @@ export default function HeartRateHistoryScreen({ route }) {
     const load = async () => {
       try {
         const q = query(
-          collection(db, 'heartRateMeasurements'),
+          collection(db, 'hgsMeasurements'),
           where('horseId', '==', horseId),
           where('userId', '==', user.uid),
           orderBy('createdAt', 'desc'),
@@ -41,11 +53,9 @@ export default function HeartRateHistoryScreen({ route }) {
         const data = snap.docs.map((d) => ({ id: d.id, ...d.data() })).reverse();
         setMeasurements(data);
       } catch (err) {
-        console.error('Errore caricamento storico:', err);
-        // Fallback: query senza orderBy (non richiede indice composito)
         try {
           const q2 = query(
-            collection(db, 'heartRateMeasurements'),
+            collection(db, 'hgsMeasurements'),
             where('horseId', '==', horseId),
             where('userId', '==', user.uid),
             limit(20)
@@ -60,7 +70,6 @@ export default function HeartRateHistoryScreen({ route }) {
             });
           setMeasurements(data2);
         } catch (err2) {
-          console.error('Errore fallback:', err2);
           setError('Errore nel caricamento dei dati.');
         }
       } finally {
@@ -74,13 +83,13 @@ export default function HeartRateHistoryScreen({ route }) {
     return <View style={styles.centered}><ActivityIndicator size="large" color={COLORS.primary} /></View>;
   }
 
-  const baseline = measurements.length > 0
-    ? Math.round(measurements.reduce((sum, m) => sum + m.bpm, 0) / measurements.length)
+  const average = measurements.length > 0
+    ? Math.round(measurements.reduce((sum, m) => sum + m.hgsScore, 0) / measurements.length * 10) / 10
     : null;
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Text style={styles.title}>📊 Storico Battito</Text>
+      <Text style={styles.title}>📊 Storico HGS</Text>
 
       {error ? (
         <View style={styles.emptyCard}>
@@ -88,44 +97,50 @@ export default function HeartRateHistoryScreen({ route }) {
         </View>
       ) : measurements.length === 0 ? (
         <View style={styles.emptyCard}>
-          <Text style={styles.emptyText}>Nessuna misurazione registrata.</Text>
-          <Text style={styles.emptyHint}>Torna alla schermata Battito Cardiaco per effettuare la prima misurazione.</Text>
+          <Text style={styles.emptyText}>Nessuna valutazione HGS registrata.</Text>
+          <Text style={styles.emptyHint}>Torna alla schermata Scala Dolore per effettuare la prima valutazione.</Text>
         </View>
       ) : (
         <>
-          {/* Baseline */}
-          {baseline !== null && (
+          {average !== null && (
             <View style={styles.baselineCard}>
-              <Text style={styles.baselineLabel}>Baseline (media)</Text>
-              <Text style={[styles.baselineValue, { color: getAlertColor(baseline) }]}>{baseline} BPM</Text>
-              <Text style={styles.baselineCount}>su {measurements.length} misurazioni</Text>
+              <Text style={styles.baselineLabel}>Media HGS</Text>
+              <Text style={[styles.baselineValue, { color: getAlertColor(Math.round(average)) }]}>
+                {average}/12
+              </Text>
+              <Text style={[styles.baselineLevel, { color: getAlertColor(Math.round(average)) }]}>
+                {getAlertLabel(Math.round(average))}
+              </Text>
+              <Text style={styles.baselineCount}>su {measurements.length} valutazioni</Text>
             </View>
           )}
 
-          {/* Grafico */}
           <View style={styles.chartCard}>
-            <Text style={styles.chartTitle}>Ultime misurazioni</Text>
-            <MiniChart data={measurements} />
+            <Text style={styles.chartTitle}>Andamento nel tempo</Text>
+            <HGSChart data={measurements} />
           </View>
 
-          {/* Lista misurazioni */}
           <Text style={styles.sectionTitle}>Dettaglio</Text>
-          {[...measurements].reverse().map((m, i) => {
+          {[...measurements].reverse().map((m) => {
             const date = m.createdAt?.toDate ? m.createdAt.toDate() : new Date();
             return (
               <View key={m.id} style={styles.measureCard}>
-                <View style={[styles.dot, { backgroundColor: getAlertColor(m.bpm) }]} />
+                <View style={[styles.scoreBadge, { backgroundColor: getAlertColor(m.hgsScore) }]}>
+                  <Text style={styles.scoreBadgeText}>{m.hgsScore}</Text>
+                </View>
                 <View style={styles.measureInfo}>
-                  <Text style={styles.measureBpm}>{m.bpm} BPM</Text>
+                  <Text style={styles.measureScore}>HGS {m.hgsScore}/12 — {getAlertLabel(m.hgsScore)}</Text>
                   <Text style={styles.measureDate}>
                     {date.toLocaleDateString('it-IT', { day: 'numeric', month: 'short', year: 'numeric' })}
                     {' · '}
                     {date.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })}
                   </Text>
+                  {m.scores && (
+                    <Text style={styles.measureZones}>
+                      {Object.entries(m.scores).map(([k, v]) => `${AU_LABELS[k] || k}: ${v}`).join(' · ')}
+                    </Text>
+                  )}
                 </View>
-                <Text style={[styles.measureAlert, { color: getAlertColor(m.bpm) }]}>
-                  {m.alert || '—'}
-                </Text>
               </View>
             );
           })}
@@ -135,60 +150,68 @@ export default function HeartRateHistoryScreen({ route }) {
   );
 }
 
-function MiniChart({ data }) {
+function HGSChart({ data }) {
   if (data.length < 2) {
-    return <Text style={styles.chartHint}>Servono almeno 2 misurazioni per il grafico.</Text>;
+    return <Text style={styles.chartHint}>Servono almeno 2 valutazioni per il grafico.</Text>;
   }
 
-  const width = Math.max(data.length * 50, 300);
+  const width = Math.max(data.length * 60, 300);
   const chartW = width - CHART_PADDING * 2;
   const chartH = CHART_HEIGHT - 40;
 
-  const getY = (bpm) => {
-    const clamped = Math.max(MIN_BPM, Math.min(MAX_BPM, bpm));
-    return chartH - ((clamped - MIN_BPM) / (MAX_BPM - MIN_BPM)) * chartH + 20;
+  const getY = (score) => {
+    const clamped = Math.max(0, Math.min(12, score));
+    return chartH - (clamped / 12) * chartH + 20;
   };
   const getX = (i) => CHART_PADDING + (i / (data.length - 1)) * chartW;
 
-  // Zona normale (28-44)
-  const normalTop = getY(44);
-  const normalH = getY(28) - normalTop;
+  const normalTop = getY(2);
+  const normalH = getY(0) - normalTop;
 
   return (
     <ScrollView horizontal showsHorizontalScrollIndicator={false}>
       <Svg width={width} height={CHART_HEIGHT}>
-        {/* Zona normale */}
         <Rect x={CHART_PADDING} y={normalTop} width={chartW} height={normalH} fill={COLORS.success} opacity={0.1} />
 
-        {/* Linee guida */}
-        {[20, 28, 36, 44, 52, 64].map((v) => (
+        {[0, 2, 5, 6, 12].map((v) => (
           <React.Fragment key={v}>
             <Line x1={CHART_PADDING} y1={getY(v)} x2={width - CHART_PADDING} y2={getY(v)} stroke={COLORS.border} strokeWidth={1} strokeDasharray="4 4" />
             <SvgText x={4} y={getY(v) + 4} fontSize={10} fill={COLORS.textLight}>{v}</SvgText>
           </React.Fragment>
         ))}
 
-        {/* Linee tra punti */}
         {data.map((m, i) => {
           if (i === 0) return null;
           return (
             <Line
               key={`line-${i}`}
-              x1={getX(i - 1)} y1={getY(data[i - 1].bpm)}
-              x2={getX(i)} y2={getY(m.bpm)}
+              x1={getX(i - 1)} y1={getY(data[i - 1].hgsScore)}
+              x2={getX(i)} y2={getY(m.hgsScore)}
               stroke={COLORS.primary} strokeWidth={2}
             />
           );
         })}
 
-        {/* Punti */}
         {data.map((m, i) => (
           <Circle
             key={`dot-${i}`}
-            cx={getX(i)} cy={getY(m.bpm)}
-            r={5} fill={getAlertColor(m.bpm)} stroke={COLORS.white} strokeWidth={2}
+            cx={getX(i)} cy={getY(m.hgsScore)}
+            r={6} fill={getAlertColor(m.hgsScore)} stroke={COLORS.white} strokeWidth={2}
           />
         ))}
+
+        {data.map((m, i) => {
+          const date = m.createdAt?.toDate ? m.createdAt.toDate() : new Date();
+          return (
+            <SvgText
+              key={`label-${i}`}
+              x={getX(i)} y={CHART_HEIGHT - 4}
+              textAnchor="middle" fontSize={9} fill={COLORS.textLight}
+            >
+              {date.toLocaleDateString('it-IT', { day: 'numeric', month: 'short' })}
+            </SvgText>
+          );
+        })}
       </Svg>
     </ScrollView>
   );
@@ -212,6 +235,7 @@ const styles = StyleSheet.create({
   },
   baselineLabel: { fontSize: 13, color: COLORS.textLight },
   baselineValue: { fontSize: 36, fontWeight: 'bold', marginVertical: 4 },
+  baselineLevel: { fontSize: 16, fontWeight: '600', marginBottom: 4 },
   baselineCount: { fontSize: 12, color: COLORS.textLight },
   chartCard: {
     backgroundColor: COLORS.white, borderRadius: 12, padding: 16, marginBottom: 8,
@@ -224,9 +248,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center',
     elevation: 1, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 2,
   },
-  dot: { width: 10, height: 10, borderRadius: 5, marginRight: 12 },
+  scoreBadge: {
+    width: 40, height: 40, borderRadius: 20, justifyContent: 'center', alignItems: 'center', marginRight: 12,
+  },
+  scoreBadgeText: { fontSize: 18, fontWeight: 'bold', color: COLORS.white },
   measureInfo: { flex: 1 },
-  measureBpm: { fontSize: 16, fontWeight: 'bold', color: COLORS.text },
+  measureScore: { fontSize: 15, fontWeight: 'bold', color: COLORS.text },
   measureDate: { fontSize: 12, color: COLORS.textLight, marginTop: 2 },
-  measureAlert: { fontSize: 13, fontWeight: '600' },
+  measureZones: { fontSize: 11, color: COLORS.textLight, marginTop: 4 },
 });

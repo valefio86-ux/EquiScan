@@ -5,6 +5,7 @@ import {
 import { collection, query, where, orderBy, limit, getDocs } from 'firebase/firestore';
 import Svg, { Line, Circle, Rect, Text as SvgText } from 'react-native-svg';
 import { db } from '../firebaseConfig';
+import { useAuth } from '../context/AuthContext';
 import { COLORS } from '../theme/colors';
 
 const CHART_HEIGHT = 200;
@@ -37,6 +38,7 @@ const ZONE_LABELS = {
 
 export default function BCSHistoryScreen({ route }) {
   const { horseId } = route.params;
+  const { user } = useAuth();
   const [measurements, setMeasurements] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -47,6 +49,7 @@ export default function BCSHistoryScreen({ route }) {
         const q = query(
           collection(db, 'bcsMeasurements'),
           where('horseId', '==', horseId),
+          where('userId', '==', user.uid),
           orderBy('createdAt', 'desc'),
           limit(20)
         );
@@ -59,6 +62,7 @@ export default function BCSHistoryScreen({ route }) {
           const q2 = query(
             collection(db, 'bcsMeasurements'),
             where('horseId', '==', horseId),
+            where('userId', '==', user.uid),
             limit(20)
           );
           const snap2 = await getDocs(q2);

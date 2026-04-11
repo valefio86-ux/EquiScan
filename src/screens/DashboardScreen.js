@@ -5,6 +5,7 @@ import {
 } from 'react-native';
 import { doc, onSnapshot, collection, query, where, orderBy, limit, getDocs } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
+import { useAuth } from '../context/AuthContext';
 import { COLORS } from '../theme/colors';
 import HealthGauge from '../components/HealthGauge';
 
@@ -12,13 +13,14 @@ import HealthGauge from '../components/HealthGauge';
 const MODULES = [
   { key: 'heart', icon: '❤️', title: 'Battito Cardiaco', unit: 'BPM', phase: 4, screen: 'HeartRate' },
   { key: 'bcs', icon: '⚖️', title: 'Body Condition', unit: '/9', phase: 5, screen: 'BCS' },
-  { key: 'pain', icon: '😣', title: 'Scala Dolore', unit: '/12', phase: 6, screen: null },
+  { key: 'pain', icon: '😣', title: 'Scala Dolore', unit: '/12', phase: 6, screen: 'HGS' },
   { key: 'gut', icon: '🔊', title: 'Borborigmi', unit: '/12', phase: 7, screen: null },
   { key: 'diet', icon: '🥕', title: 'Dieta', unit: '', phase: 8, screen: null },
 ];
 
 export default function DashboardScreen({ route, navigation }) {
   const { horseId } = route.params;
+  const { user } = useAuth();
   const [horse, setHorse] = useState(null);
   const [loading, setLoading] = useState(true);
   const [latestValues, setLatestValues] = useState({ heart: null, bcs: null });
@@ -45,6 +47,7 @@ export default function DashboardScreen({ route, navigation }) {
         const hq = query(
           collection(db, 'heartRateMeasurements'),
           where('horseId', '==', horseId),
+          where('userId', '==', user.uid),
           orderBy('createdAt', 'desc'),
           limit(1)
         );
@@ -57,6 +60,7 @@ export default function DashboardScreen({ route, navigation }) {
           const hq2 = query(
             collection(db, 'heartRateMeasurements'),
             where('horseId', '==', horseId),
+            where('userId', '==', user.uid),
             limit(5)
           );
           const hSnap2 = await getDocs(hq2);
@@ -74,6 +78,7 @@ export default function DashboardScreen({ route, navigation }) {
         const bq = query(
           collection(db, 'bcsMeasurements'),
           where('horseId', '==', horseId),
+          where('userId', '==', user.uid),
           orderBy('createdAt', 'desc'),
           limit(1)
         );
@@ -86,6 +91,7 @@ export default function DashboardScreen({ route, navigation }) {
           const bq2 = query(
             collection(db, 'bcsMeasurements'),
             where('horseId', '==', horseId),
+            where('userId', '==', user.uid),
             limit(5)
           );
           const bSnap2 = await getDocs(bq2);
@@ -94,6 +100,37 @@ export default function DashboardScreen({ route, navigation }) {
               .map(d => d.data())
               .sort((a, b) => (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0));
             results.bcs = sorted[0].bcsScore;
+          }
+        } catch (_) { /* ignore */ }
+      }
+
+      // Ultimo HGS
+      try {
+        const pq = query(
+          collection(db, 'hgsMeasurements'),
+          where('horseId', '==', horseId),
+          where('userId', '==', user.uid),
+          orderBy('createdAt', 'desc'),
+          limit(1)
+        );
+        const pSnap = await getDocs(pq);
+        if (!pSnap.empty) {
+          results.pain = pSnap.docs[0].data().hgsScore;
+        }
+      } catch (e) {
+        try {
+          const pq2 = query(
+            collection(db, 'hgsMeasurements'),
+            where('horseId', '==', horseId),
+            where('userId', '==', user.uid),
+            limit(5)
+          );
+          const pSnap2 = await getDocs(pq2);
+          if (!pSnap2.empty) {
+            const sorted = pSnap2.docs
+              .map(d => d.data())
+              .sort((a, b) => (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0));
+            results.pain = sorted[0].hgsScore;
           }
         } catch (_) { /* ignore */ }
       }
@@ -125,6 +162,12 @@ export default function DashboardScreen({ route, navigation }) {
     else if (latestValues.bcs === 3 || latestValues.bcs === 7) scores.push(60);
     else scores.push(25);
   }
+  if (latestValues.pain != null) {
+    // HGS: 0-2 ottimo, 3-5 moderato, 6+ grave
+    if (latestValues.pain <= 2) scores.push(100);
+    else if (latestValues.pain <= 5) scores.push(50);
+    else scores.push(15);
+  }
   const healthScore = scores.length > 0
     ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length)
     : null;
@@ -149,6 +192,11 @@ export default function DashboardScreen({ route, navigation }) {
       if (val === 7) return 'Sovrappeso';
       return 'Obeso';
     }
+    if (mod.key === 'pain') {
+      if (val <= 2) return 'Nessun dolore';
+      if (val <= 5) return 'Dolore moderato';
+      return 'Dolore significativo';
+    }
     return `Fase ${mod.phase}`;
   };
 
@@ -163,6 +211,11 @@ export default function DashboardScreen({ route, navigation }) {
     if (mod.key === 'bcs') {
       if (val >= 4 && val <= 6) return COLORS.success;
       if (val <= 3 || val === 7) return COLORS.warning;
+      return COLORS.error;
+    }
+    if (mod.key === 'pain') {
+      if (val <= 2) return COLORS.success;
+      if (val <= 5) return COLORS.warning;
       return COLORS.error;
     }
     return COLORS.textLight;

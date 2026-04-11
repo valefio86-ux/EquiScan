@@ -107,6 +107,7 @@ export default function HeartRateScreen({ route, navigation }) {
       const q = query(
         collection(db, 'heartRateMeasurements'),
         where('horseId', '==', horseId),
+        where('userId', '==', user.uid),
         orderBy('createdAt', 'desc'),
         limit(10)
       );

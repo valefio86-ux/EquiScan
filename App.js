@@ -19,6 +19,8 @@ import BCSScreen from './src/screens/BCSScreen';
 import BCSHistoryScreen from './src/screens/BCSHistoryScreen';
 import HGSScreen from './src/screens/HGSScreen';
 import HGSHistoryScreen from './src/screens/HGSHistoryScreen';
+import BorborigmiScreen from './src/screens/BorborigmiScreen';
+import BorborigmiHistoryScreen from './src/screens/BorborigmiHistoryScreen';
 
 const AuthStack = createNativeStackNavigator();
 const AppStack = createNativeStackNavigator();
@@ -47,6 +49,8 @@ function AppNavigator() {
       <AppStack.Screen name="BCSHistory" component={BCSHistoryScreen} options={{ title: 'Storico BCS' }} />
       <AppStack.Screen name="HGS" component={HGSScreen} options={{ title: 'Scala Dolore (HGS)' }} />
       <AppStack.Screen name="HGSHistory" component={HGSHistoryScreen} options={{ title: 'Storico HGS' }} />
+      <AppStack.Screen name="Borborigmi" component={BorborigmiScreen} options={{ title: 'Borborigmi' }} />
+      <AppStack.Screen name="BorborigmiHistory" component={BorborigmiHistoryScreen} options={{ title: 'Storico Borborigmi' }} />
     </AppStack.Navigator>
   );
 }

@@ -14,7 +14,7 @@ const MODULES = [
   { key: 'heart', icon: '❤️', title: 'Battito Cardiaco', unit: 'BPM', phase: 4, screen: 'HeartRate' },
   { key: 'bcs', icon: '⚖️', title: 'Body Condition', unit: '/9', phase: 5, screen: 'BCS' },
   { key: 'pain', icon: '😣', title: 'Scala Dolore', unit: '/12', phase: 6, screen: 'HGS' },
-  { key: 'gut', icon: '🔊', title: 'Borborigmi', unit: '/12', phase: 7, screen: null },
+  { key: 'gut', icon: '🔊', title: 'Borborigmi', unit: '/12', phase: 7, screen: 'Borborigmi' },
   { key: 'diet', icon: '🥕', title: 'Dieta', unit: '', phase: 8, screen: null },
 ];
 
@@ -135,6 +135,37 @@ export default function DashboardScreen({ route, navigation }) {
         } catch (_) { /* ignore */ }
       }
 
+      // Ultimo Borborigmi
+      try {
+        const gq = query(
+          collection(db, 'borborigmiMeasurements'),
+          where('horseId', '==', horseId),
+          where('userId', '==', user.uid),
+          orderBy('createdAt', 'desc'),
+          limit(1)
+        );
+        const gSnap = await getDocs(gq);
+        if (!gSnap.empty) {
+          results.gut = gSnap.docs[0].data().totalScore;
+        }
+      } catch (e) {
+        try {
+          const gq2 = query(
+            collection(db, 'borborigmiMeasurements'),
+            where('horseId', '==', horseId),
+            where('userId', '==', user.uid),
+            limit(5)
+          );
+          const gSnap2 = await getDocs(gq2);
+          if (!gSnap2.empty) {
+            const sorted = gSnap2.docs
+              .map(d => d.data())
+              .sort((a, b) => (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0));
+            results.gut = sorted[0].totalScore;
+          }
+        } catch (_) { /* ignore */ }
+      }
+
       setLatestValues(prev => ({ ...prev, ...results }));
     };
 
@@ -168,6 +199,12 @@ export default function DashboardScreen({ route, navigation }) {
     else if (latestValues.pain <= 5) scores.push(50);
     else scores.push(15);
   }
+  if (latestValues.gut != null) {
+    // Borborigmi: 8 ideale (tutti normali=2*4), 4-7 ridotti, <4 grave
+    if (latestValues.gut >= 7 && latestValues.gut <= 9) scores.push(100);
+    else if (latestValues.gut >= 5 && latestValues.gut <= 11) scores.push(60);
+    else scores.push(20);
+  }
   const healthScore = scores.length > 0
     ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length)
     : null;
@@ -197,6 +234,11 @@ export default function DashboardScreen({ route, navigation }) {
       if (val <= 5) return 'Dolore moderato';
       return 'Dolore significativo';
     }
+    if (mod.key === 'gut') {
+      if (val >= 7 && val <= 9) return 'Normale';
+      if (val >= 5) return 'Attenzione';
+      return 'Critico';
+    }
     return `Fase ${mod.phase}`;
   };
 
@@ -216,6 +258,11 @@ export default function DashboardScreen({ route, navigation }) {
     if (mod.key === 'pain') {
       if (val <= 2) return COLORS.success;
       if (val <= 5) return COLORS.warning;
+      return COLORS.error;
+    }
+    if (mod.key === 'gut') {
+      if (val >= 7 && val <= 9) return COLORS.success;
+      if (val >= 5) return COLORS.warning;
       return COLORS.error;
     }
     return COLORS.textLight;

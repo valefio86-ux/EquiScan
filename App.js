@@ -15,6 +15,8 @@ import EditHorseScreen from './src/screens/EditHorseScreen';
 import DashboardScreen from './src/screens/DashboardScreen';
 import HeartRateScreen from './src/screens/HeartRateScreen';
 import HeartRateHistoryScreen from './src/screens/HeartRateHistoryScreen';
+import BCSScreen from './src/screens/BCSScreen';
+import BCSHistoryScreen from './src/screens/BCSHistoryScreen';
 
 const AuthStack = createNativeStackNavigator();
 const AppStack = createNativeStackNavigator();
@@ -39,6 +41,8 @@ function AppNavigator() {
       <AppStack.Screen name="EditHorse" component={EditHorseScreen} options={{ title: 'Modifica Cavallo' }} />
       <AppStack.Screen name="HeartRate" component={HeartRateScreen} options={{ title: 'Battito Cardiaco' }} />
       <AppStack.Screen name="HeartRateHistory" component={HeartRateHistoryScreen} options={{ title: 'Storico Battito' }} />
+      <AppStack.Screen name="BCS" component={BCSScreen} options={{ title: 'Body Condition Score' }} />
+      <AppStack.Screen name="BCSHistory" component={BCSHistoryScreen} options={{ title: 'Storico BCS' }} />
     </AppStack.Navigator>
   );
 }

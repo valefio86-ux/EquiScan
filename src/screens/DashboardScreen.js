@@ -3,7 +3,7 @@ import {
   View, Text, ScrollView, TouchableOpacity,
   StyleSheet, ActivityIndicator,
 } from 'react-native';
-import { doc, onSnapshot } from 'firebase/firestore';
+import { doc, onSnapshot, collection, query, where, orderBy, limit, getDocs } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 import { COLORS } from '../theme/colors';
 import HealthGauge from '../components/HealthGauge';
@@ -11,7 +11,7 @@ import HealthGauge from '../components/HealthGauge';
 // Moduli che verranno implementati nelle fasi successive
 const MODULES = [
   { key: 'heart', icon: '❤️', title: 'Battito Cardiaco', unit: 'BPM', phase: 4, screen: 'HeartRate' },
-  { key: 'bcs', icon: '⚖️', title: 'Body Condition', unit: '/9', phase: 5, screen: null },
+  { key: 'bcs', icon: '⚖️', title: 'Body Condition', unit: '/9', phase: 5, screen: 'BCS' },
   { key: 'pain', icon: '😣', title: 'Scala Dolore', unit: '/12', phase: 6, screen: null },
   { key: 'gut', icon: '🔊', title: 'Borborigmi', unit: '/12', phase: 7, screen: null },
   { key: 'diet', icon: '🥕', title: 'Dieta', unit: '', phase: 8, screen: null },
@@ -21,6 +21,7 @@ export default function DashboardScreen({ route, navigation }) {
   const { horseId } = route.params;
   const [horse, setHorse] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [latestValues, setLatestValues] = useState({ heart: null, bcs: null });
 
   useEffect(() => {
     const unsubscribe = onSnapshot(doc(db, 'horses', horseId), (snap) => {
@@ -34,14 +35,138 @@ export default function DashboardScreen({ route, navigation }) {
     return unsubscribe;
   }, [horseId]);
 
+  // Carica ultimi valori misurazioni
+  useEffect(() => {
+    const fetchLatest = async () => {
+      const results = {};
+
+      // Ultimo battito cardiaco
+      try {
+        const hq = query(
+          collection(db, 'heartRateMeasurements'),
+          where('horseId', '==', horseId),
+          orderBy('createdAt', 'desc'),
+          limit(1)
+        );
+        const hSnap = await getDocs(hq);
+        if (!hSnap.empty) {
+          results.heart = hSnap.docs[0].data().bpm;
+        }
+      } catch (e) {
+        try {
+          const hq2 = query(
+            collection(db, 'heartRateMeasurements'),
+            where('horseId', '==', horseId),
+            limit(5)
+          );
+          const hSnap2 = await getDocs(hq2);
+          if (!hSnap2.empty) {
+            const sorted = hSnap2.docs
+              .map(d => d.data())
+              .sort((a, b) => (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0));
+            results.heart = sorted[0].bpm;
+          }
+        } catch (_) { /* ignore */ }
+      }
+
+      // Ultimo BCS
+      try {
+        const bq = query(
+          collection(db, 'bcsMeasurements'),
+          where('horseId', '==', horseId),
+          orderBy('createdAt', 'desc'),
+          limit(1)
+        );
+        const bSnap = await getDocs(bq);
+        if (!bSnap.empty) {
+          results.bcs = bSnap.docs[0].data().bcsScore;
+        }
+      } catch (e) {
+        try {
+          const bq2 = query(
+            collection(db, 'bcsMeasurements'),
+            where('horseId', '==', horseId),
+            limit(5)
+          );
+          const bSnap2 = await getDocs(bq2);
+          if (!bSnap2.empty) {
+            const sorted = bSnap2.docs
+              .map(d => d.data())
+              .sort((a, b) => (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0));
+            results.bcs = sorted[0].bcsScore;
+          }
+        } catch (_) { /* ignore */ }
+      }
+
+      setLatestValues(prev => ({ ...prev, ...results }));
+    };
+
+    fetchLatest();
+  }, [horseId]);
+
   if (loading) {
     return <View style={styles.centered}><ActivityIndicator size="large" color={COLORS.primary} /></View>;
   }
 
   if (!horse) return null;
 
-  // Per ora il punteggio è null (nessun dato). Si collegherà nelle fasi 4-8.
-  const healthScore = null;
+  // Calcola punteggio salute basato sui dati disponibili
+  const scores = [];
+  if (latestValues.heart != null) {
+    // BPM ideale cavallo a riposo: 28-44
+    if (latestValues.heart >= 28 && latestValues.heart <= 44) scores.push(100);
+    else if (latestValues.heart >= 20 && latestValues.heart <= 52) scores.push(70);
+    else if (latestValues.heart >= 12 && latestValues.heart <= 60) scores.push(40);
+    else scores.push(15);
+  }
+  if (latestValues.bcs != null) {
+    // BCS ideale: 4-6
+    if (latestValues.bcs >= 4 && latestValues.bcs <= 6) scores.push(100);
+    else if (latestValues.bcs === 3 || latestValues.bcs === 7) scores.push(60);
+    else scores.push(25);
+  }
+  const healthScore = scores.length > 0
+    ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length)
+    : null;
+
+  const getCardValue = (mod) => {
+    const val = latestValues[mod.key];
+    if (val == null) return '—';
+    return `${val}`;
+  };
+
+  const getCardStatus = (mod) => {
+    const val = latestValues[mod.key];
+    if (val == null) return `Fase ${mod.phase}`;
+    if (mod.key === 'heart') {
+      if (val >= 28 && val <= 44) return 'Normale';
+      if (val >= 20 && val <= 52) return 'Attenzione';
+      return 'Critico';
+    }
+    if (mod.key === 'bcs') {
+      if (val >= 4 && val <= 6) return 'Ideale';
+      if (val <= 3) return 'Sottopeso';
+      if (val === 7) return 'Sovrappeso';
+      return 'Obeso';
+    }
+    return `Fase ${mod.phase}`;
+  };
+
+  const getStatusColor = (mod) => {
+    const val = latestValues[mod.key];
+    if (val == null) return COLORS.textLight;
+    if (mod.key === 'heart') {
+      if (val >= 28 && val <= 44) return COLORS.success;
+      if (val >= 20 && val <= 52) return COLORS.warning;
+      return COLORS.error;
+    }
+    if (mod.key === 'bcs') {
+      if (val >= 4 && val <= 6) return COLORS.success;
+      if (val <= 3 || val === 7) return COLORS.warning;
+      return COLORS.error;
+    }
+    return COLORS.textLight;
+  };
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
@@ -70,8 +195,10 @@ export default function DashboardScreen({ route, navigation }) {
           >
             <Text style={styles.cardIcon}>{mod.icon}</Text>
             <Text style={styles.cardTitle}>{mod.title}</Text>
-            <Text style={styles.cardValue}>—</Text>
-            <Text style={styles.cardStatus}>Fase {mod.phase}</Text>
+            <Text style={[styles.cardValue, latestValues[mod.key] != null && { color: getStatusColor(mod) }]}>
+              {getCardValue(mod)}{latestValues[mod.key] != null ? ` ${mod.unit}` : ''}
+            </Text>
+            <Text style={[styles.cardStatus, { color: getStatusColor(mod) }]}>{getCardStatus(mod)}</Text>
           </TouchableOpacity>
         ))}
       </View>

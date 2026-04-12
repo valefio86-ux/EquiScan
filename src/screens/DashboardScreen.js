@@ -8,6 +8,7 @@ import { db } from '../firebaseConfig';
 import { useAuth } from '../context/AuthContext';
 import { COLORS } from '../theme/colors';
 import HealthGauge from '../components/HealthGauge';
+import { useFocusEffect } from '@react-navigation/native';
 
 // Moduli che verranno implementati nelle fasi successive
 const MODULES = [
@@ -38,139 +39,145 @@ export default function DashboardScreen({ route, navigation }) {
   }, [horseId]);
 
   // Carica ultimi valori misurazioni
-  useEffect(() => {
-    const fetchLatest = async () => {
-      const results = {};
+  const fetchLatest = React.useCallback(async () => {
+    const results = {};
 
-      // Ultimo battito cardiaco
+    // Ultimo battito cardiaco
+    try {
+      const hq = query(
+        collection(db, 'heartRateMeasurements'),
+        where('horseId', '==', horseId),
+        where('userId', '==', user.uid),
+        orderBy('createdAt', 'desc'),
+        limit(1)
+      );
+      const hSnap = await getDocs(hq);
+      if (!hSnap.empty) {
+        results.heart = hSnap.docs[0].data().bpm;
+      }
+    } catch (e) {
       try {
-        const hq = query(
+        const hq2 = query(
           collection(db, 'heartRateMeasurements'),
           where('horseId', '==', horseId),
           where('userId', '==', user.uid),
-          orderBy('createdAt', 'desc'),
-          limit(1)
+          limit(5)
         );
-        const hSnap = await getDocs(hq);
-        if (!hSnap.empty) {
-          results.heart = hSnap.docs[0].data().bpm;
+        const hSnap2 = await getDocs(hq2);
+        if (!hSnap2.empty) {
+          const sorted = hSnap2.docs
+            .map(d => d.data())
+            .sort((a, b) => (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0));
+          results.heart = sorted[0].bpm;
         }
-      } catch (e) {
-        try {
-          const hq2 = query(
-            collection(db, 'heartRateMeasurements'),
-            where('horseId', '==', horseId),
-            where('userId', '==', user.uid),
-            limit(5)
-          );
-          const hSnap2 = await getDocs(hq2);
-          if (!hSnap2.empty) {
-            const sorted = hSnap2.docs
-              .map(d => d.data())
-              .sort((a, b) => (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0));
-            results.heart = sorted[0].bpm;
-          }
-        } catch (_) { /* ignore */ }
-      }
+      } catch (_) { /* ignore */ }
+    }
 
-      // Ultimo BCS
+    // Ultimo BCS
+    try {
+      const bq = query(
+        collection(db, 'bcsMeasurements'),
+        where('horseId', '==', horseId),
+        where('userId', '==', user.uid),
+        orderBy('createdAt', 'desc'),
+        limit(1)
+      );
+      const bSnap = await getDocs(bq);
+      if (!bSnap.empty) {
+        results.bcs = bSnap.docs[0].data().bcsScore;
+      }
+    } catch (e) {
       try {
-        const bq = query(
+        const bq2 = query(
           collection(db, 'bcsMeasurements'),
           where('horseId', '==', horseId),
           where('userId', '==', user.uid),
-          orderBy('createdAt', 'desc'),
-          limit(1)
+          limit(5)
         );
-        const bSnap = await getDocs(bq);
-        if (!bSnap.empty) {
-          results.bcs = bSnap.docs[0].data().bcsScore;
+        const bSnap2 = await getDocs(bq2);
+        if (!bSnap2.empty) {
+          const sorted = bSnap2.docs
+            .map(d => d.data())
+            .sort((a, b) => (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0));
+          results.bcs = sorted[0].bcsScore;
         }
-      } catch (e) {
-        try {
-          const bq2 = query(
-            collection(db, 'bcsMeasurements'),
-            where('horseId', '==', horseId),
-            where('userId', '==', user.uid),
-            limit(5)
-          );
-          const bSnap2 = await getDocs(bq2);
-          if (!bSnap2.empty) {
-            const sorted = bSnap2.docs
-              .map(d => d.data())
-              .sort((a, b) => (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0));
-            results.bcs = sorted[0].bcsScore;
-          }
-        } catch (_) { /* ignore */ }
-      }
+      } catch (_) { /* ignore */ }
+    }
 
-      // Ultimo HGS
+    // Ultimo HGS
+    try {
+      const pq = query(
+        collection(db, 'hgsMeasurements'),
+        where('horseId', '==', horseId),
+        where('userId', '==', user.uid),
+        orderBy('createdAt', 'desc'),
+        limit(1)
+      );
+      const pSnap = await getDocs(pq);
+      if (!pSnap.empty) {
+        results.pain = pSnap.docs[0].data().hgsScore;
+      }
+    } catch (e) {
       try {
-        const pq = query(
+        const pq2 = query(
           collection(db, 'hgsMeasurements'),
           where('horseId', '==', horseId),
           where('userId', '==', user.uid),
-          orderBy('createdAt', 'desc'),
-          limit(1)
+          limit(5)
         );
-        const pSnap = await getDocs(pq);
-        if (!pSnap.empty) {
-          results.pain = pSnap.docs[0].data().hgsScore;
+        const pSnap2 = await getDocs(pq2);
+        if (!pSnap2.empty) {
+          const sorted = pSnap2.docs
+            .map(d => d.data())
+            .sort((a, b) => (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0));
+          results.pain = sorted[0].hgsScore;
         }
-      } catch (e) {
-        try {
-          const pq2 = query(
-            collection(db, 'hgsMeasurements'),
-            where('horseId', '==', horseId),
-            where('userId', '==', user.uid),
-            limit(5)
-          );
-          const pSnap2 = await getDocs(pq2);
-          if (!pSnap2.empty) {
-            const sorted = pSnap2.docs
-              .map(d => d.data())
-              .sort((a, b) => (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0));
-            results.pain = sorted[0].hgsScore;
-          }
-        } catch (_) { /* ignore */ }
-      }
+      } catch (_) { /* ignore */ }
+    }
 
-      // Ultimo Borborigmi
+    // Ultimo Borborigmi
+    try {
+      const gq = query(
+        collection(db, 'borborigmiMeasurements'),
+        where('horseId', '==', horseId),
+        where('userId', '==', user.uid),
+        orderBy('createdAt', 'desc'),
+        limit(1)
+      );
+      const gSnap = await getDocs(gq);
+      if (!gSnap.empty) {
+        results.gut = gSnap.docs[0].data().totalScore;
+      }
+    } catch (e) {
       try {
-        const gq = query(
+        const gq2 = query(
           collection(db, 'borborigmiMeasurements'),
           where('horseId', '==', horseId),
           where('userId', '==', user.uid),
-          orderBy('createdAt', 'desc'),
-          limit(1)
+          limit(5)
         );
-        const gSnap = await getDocs(gq);
-        if (!gSnap.empty) {
-          results.gut = gSnap.docs[0].data().totalScore;
+        const gSnap2 = await getDocs(gq2);
+        if (!gSnap2.empty) {
+          const sorted = gSnap2.docs
+            .map(d => d.data())
+            .sort((a, b) => (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0));
+          results.gut = sorted[0].totalScore;
         }
-      } catch (e) {
-        try {
-          const gq2 = query(
-            collection(db, 'borborigmiMeasurements'),
-            where('horseId', '==', horseId),
-            where('userId', '==', user.uid),
-            limit(5)
-          );
-          const gSnap2 = await getDocs(gq2);
-          if (!gSnap2.empty) {
-            const sorted = gSnap2.docs
-              .map(d => d.data())
-              .sort((a, b) => (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0));
-            results.gut = sorted[0].totalScore;
-          }
-        } catch (_) { /* ignore */ }
-      }
+      } catch (_) { /* ignore */ }
+    }
 
-      setLatestValues(prev => ({ ...prev, ...results }));
-    };
+    setLatestValues(prev => ({ ...prev, ...results }));
+  }, [horseId, user]);
 
+  useEffect(() => {
     fetchLatest();
-  }, [horseId]);
+  }, [fetchLatest]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchLatest();
+    }, [fetchLatest])
+  );
 
   if (loading) {
     return <View style={styles.centered}><ActivityIndicator size="large" color={COLORS.primary} /></View>;

@@ -532,6 +532,21 @@ Ogni fase viene completata e testata prima di passare alla successiva.
 
 ---
 
+
+---
+
+### FASE 16 — Stability Score e Semaforo Variazioni Dinamico
+- [ ] Step 16.1: Protocollo di transizione dopo una variazione dieta (10-14 giorni)
+- [ ] Step 16.2: Semaforo Variazioni resta arancione/giallo per 10 giorni, rosso se parametri clinici negativi
+- [ ] Step 16.3: Log giornaliero obbligatorio: borborigmi, HGS, feci, battito
+- [ ] Step 16.4: Algoritmo: solo se tutti i parametri sono stabili per 10 giorni, semaforo torna verde
+- [ ] Step 16.5: Widget dinamico in homepage: mostra progresso transizione
+- [ ] Step 16.6: Notifica push smart a fine protocollo: conferma stato feci
+- [ ] Step 16.7: Algoritmo di sblocco: verde automatico solo se tutti i check ok, altrimenti giallo persistente e suggerimento veterinario
+- [ ] 🧪 **TEST:** Simulare variazione dieta, check giornalieri, verifica logica semaforo e notifiche
+
+> Questa fase trasforma il semaforo Variazioni in uno strumento clinico attivo, responsabilizzando l’utente e valorizzando i moduli HGS e borborigmi.
+
 ## ⚖️ Note Legali e Accademiche
 
 - **Privacy by Design:** i dati dei cavalli sono separati dalle anagrafiche dei proprietari

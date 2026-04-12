@@ -15,20 +15,32 @@ export default function DietaMenuScreen({ route, navigation }) {
         <Text style={styles.menuButtonDesc}>Tipo, quantità, modalità, qualità</Text>
       </TouchableOpacity>
       {/* ...categorie inserimento... */}
-      <TouchableOpacity style={styles.menuButton} disabled>
+      <TouchableOpacity
+        style={styles.menuButton}
+        onPress={() => navigation.navigate('DietaConcentrati', { horseId })}
+      >
         <Text style={styles.menuButtonText}>Concentrati</Text>
         <Text style={styles.menuButtonDesc}>Tipo, pasti, quantità, zuccheri</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.menuButton} disabled>
+      <TouchableOpacity
+        style={styles.menuButton}
+        onPress={() => navigation.navigate('DietaIdratazione', { horseId })}
+      >
         <Text style={styles.menuButtonText}>Idratazione</Text>
         <Text style={styles.menuButtonDesc}>Abbeverata, sale</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.menuButton} disabled>
+      <TouchableOpacity
+        style={styles.menuButton}
+        onPress={() => navigation.navigate('DietaPascolo', { horseId })}
+      >
         <Text style={styles.menuButtonText}>Pascolo</Text>
         <Text style={styles.menuButtonDesc}>Ore, tipo erba</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.menuButton} disabled>
-        <Text style={styles.menuButtonText}>Log variazioni</Text>
+      <TouchableOpacity
+        style={styles.menuButton}
+        onPress={() => navigation.navigate('DietaVariazioni', { horseId })}
+      >
+        <Text style={styles.menuButtonText}>Variazioni dieta</Text>
         <Text style={styles.menuButtonDesc}>Cambi fieno, mangime, box</Text>
       </TouchableOpacity>
 

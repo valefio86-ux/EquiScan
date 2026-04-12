@@ -1,4 +1,7 @@
-﻿import React from 'react';
+﻿import DietaVariazioniScreen from './src/screens/DietaVariazioniScreen';
+import DietaPascoloScreen from './src/screens/DietaPascoloScreen';
+import DietaIdratazioneScreen from './src/screens/DietaIdratazioneScreen';
+import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StatusBar } from 'expo-status-bar';
@@ -22,6 +25,7 @@ import HGSHistoryScreen from './src/screens/HGSHistoryScreen';
 import BorborigmiScreen from './src/screens/BorborigmiScreen';
 import BorborigmiHistoryScreen from './src/screens/BorborigmiHistoryScreen';
 import DietaForaggioScreen from './src/screens/DietaForaggioScreen';
+import DietaConcentratiScreen from './src/screens/DietaConcentratiScreen';
 import DietaMenuScreen from './src/screens/DietaMenuScreen';
 import DietaHistoryScreen from './src/screens/DietaHistoryScreen';
 
@@ -55,6 +59,10 @@ function AppNavigator() {
       <AppStack.Screen name="Borborigmi" component={BorborigmiScreen} options={{ title: 'Borborigmi' }} />
       <AppStack.Screen name="BorborigmiHistory" component={BorborigmiHistoryScreen} options={{ title: 'Storico Borborigmi' }} />
       <AppStack.Screen name="DietaForaggio" component={DietaForaggioScreen} options={{ title: 'Foraggio' }} />
+      <AppStack.Screen name="DietaConcentrati" component={DietaConcentratiScreen} options={{ title: 'Concentrati' }} />
+      <AppStack.Screen name="DietaIdratazione" component={DietaIdratazioneScreen} options={{ title: 'Idratazione' }} />
+      <AppStack.Screen name="DietaPascolo" component={DietaPascoloScreen} options={{ title: 'Pascolo' }} />
+      <AppStack.Screen name="DietaVariazioni" component={DietaVariazioniScreen} options={{ title: 'Variazioni dieta' }} />
       <AppStack.Screen name="DietaMenu" component={DietaMenuScreen} options={{ title: 'Gestione Dieta' }} />
       <AppStack.Screen name="DietaHistory" component={DietaHistoryScreen} options={{ title: 'Storico Dieta' }} />
     </AppStack.Navigator>

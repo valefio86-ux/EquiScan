@@ -25,6 +25,10 @@ export default function DashboardScreen({ route, navigation }) {
   const [horse, setHorse] = useState(null);
   const [loading, setLoading] = useState(true);
   const [latestValues, setLatestValues] = useState({ heart: null, bcs: null });
+  const [dietaScore, setDietaScore] = useState(null);
+  const [dietaMsg, setDietaMsg] = useState('');
+  const [dietaColor, setDietaColor] = useState(COLORS.success);
+  const [dietaDetails, setDietaDetails] = useState([]);
 
   useEffect(() => {
     const unsubscribe = onSnapshot(doc(db, 'horses', horseId), (snap) => {
@@ -173,6 +177,64 @@ export default function DashboardScreen({ route, navigation }) {
     fetchLatest();
   }, [fetchLatest]);
 
+
+  // Recupera ultimi dati dieta e calcola punteggio
+  useEffect(() => {
+    const fetchDieta = async () => {
+      let score = 2; // 2=verde, 1=giallo, 0=rosso
+      let scoreMsg = 'OK';
+      let scoreColor = COLORS.success;
+      let details = [];
+      // Foraggio
+      let recForaggio = null;
+      try {
+        const fq = query(
+          collection(db, 'dietaForaggio'),
+          where('horseId', '==', horseId),
+          where('userId', '==', user.uid),
+          orderBy('createdAt', 'desc'),
+          limit(1)
+        );
+        const snap = await getDocs(fq);
+        if (!snap.empty) recForaggio = snap.docs[0].data();
+      } catch {}
+      // Idratazione
+      let recIdratazione = null;
+      try {
+        const iq = query(
+          collection(db, 'dietaIdratazione'),
+          where('horseId', '==', horseId),
+          where('userId', '==', user.uid),
+          orderBy('createdAt', 'desc'),
+          limit(1)
+        );
+        const snap = await getDocs(iq);
+        if (!snap.empty) recIdratazione = snap.docs[0].data();
+      } catch {}
+      // Logica punteggio e dettagli
+      if (!recForaggio || !recForaggio.quantita || !recIdratazione || !recIdratazione.quantita) {
+        score = 0; scoreMsg = 'Dieta incompleta'; scoreColor = COLORS.error;
+        details = [];
+      } else {
+        let critico = false;
+        let attenzione = false;
+        details = [];
+        if (recForaggio.quantita < 4) { critico = true; details.push('Foraggio critico'); }
+        else if (recForaggio.quantita < 6) { attenzione = true; details.push('Foraggio'); }
+        if (recIdratazione.quantita < 10) { critico = true; details.push('Idratazione critica'); }
+        else if (recIdratazione.quantita < 15) { attenzione = true; details.push('Idratazione'); }
+        if (critico) { score = 0; scoreMsg = 'Critico'; scoreColor = COLORS.error; }
+        else if (attenzione) { score = 1; scoreMsg = 'Attenzione'; scoreColor = COLORS.warning; }
+        else { score = 2; scoreMsg = 'OK'; scoreColor = COLORS.success; }
+      }
+      setDietaScore(score);
+      setDietaMsg(scoreMsg);
+      setDietaColor(scoreColor);
+      setDietaDetails(details);
+    };
+    fetchDieta();
+  }, [horseId, user]);
+
   useFocusEffect(
     React.useCallback(() => {
       fetchLatest();
@@ -284,11 +346,13 @@ export default function DashboardScreen({ route, navigation }) {
         {[horse.breed, horse.sex, horse.age ? `${horse.age} anni` : null].filter(Boolean).join(' · ')}
       </Text>
 
+
       {/* Gauge centrale */}
       <View style={styles.gaugeContainer}>
         <HealthGauge score={healthScore} />
         <Text style={styles.gaugeLabel}>Stato di Salute</Text>
       </View>
+
 
       {/* Card parametri */}
       <Text style={styles.sectionTitle}>Parametri</Text>
@@ -302,10 +366,21 @@ export default function DashboardScreen({ route, navigation }) {
           >
             <Text style={styles.cardIcon}>{mod.icon}</Text>
             <Text style={styles.cardTitle}>{mod.title}</Text>
-            <Text style={[styles.cardValue, latestValues[mod.key] != null && { color: getStatusColor(mod) }]}>
-              {getCardValue(mod)}{latestValues[mod.key] != null ? ` ${mod.unit}` : ''}
-            </Text>
-            <Text style={[styles.cardStatus, { color: getStatusColor(mod) }]}>{getCardStatus(mod)}</Text>
+            {mod.key === 'diet' ? (
+              <>
+                <Text style={{ fontWeight: 'bold', color: dietaColor, fontSize: 18, marginBottom: 2 }}>{dietaMsg}</Text>
+                {dietaMsg === 'Attenzione' || dietaMsg === 'Critico' ? (
+                  <Text style={[styles.cardStatus, { color: dietaColor }]}>Problema: {dietaDetails?.join(', ')}</Text>
+                ) : null}
+              </>
+            ) : (
+              <>
+                <Text style={[styles.cardValue, latestValues[mod.key] != null && { color: getStatusColor(mod) }]}>
+                  {getCardValue(mod)}{latestValues[mod.key] != null ? ` ${mod.unit}` : ''}
+                </Text>
+                <Text style={[styles.cardStatus, { color: getStatusColor(mod) }]}>{getCardStatus(mod)}</Text>
+              </>
+            )}
           </TouchableOpacity>
         ))}
       </View>

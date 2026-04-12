@@ -83,20 +83,22 @@ export default function HeartRateScreen({ route, navigation }) {
 
   const saveMeasurement = async (bpmValue) => {
     setSaving(true);
+    const dataToSave = {
+      horseId,
+      userId: user.uid,
+      bpm: bpmValue,
+      tapCount,
+      timerSeconds: TIMER_SECONDS,
+      alert: getAlertLevel(bpmValue).level,
+      createdAt: serverTimestamp(),
+    };
+    console.log('[HeartRate] Dati da salvare:', dataToSave);
     try {
-      await addDoc(collection(db, 'heartRateMeasurements'), {
-        horseId,
-        userId: user.uid,
-        bpm: bpmValue,
-        tapCount,
-        timerSeconds: TIMER_SECONDS,
-        alert: getAlertLevel(bpmValue).level,
-        createdAt: serverTimestamp(),
-      });
+      await addDoc(collection(db, 'heartRateMeasurements'), dataToSave);
       // Calcola baseline (media ultime 10 misurazioni)
       await loadBaseline();
     } catch (error) {
-      // Salvataggio fallito silenziosamente
+      console.error('[HeartRate] Errore salvataggio:', error);
     } finally {
       setSaving(false);
     }

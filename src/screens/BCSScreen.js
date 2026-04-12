@@ -192,20 +192,22 @@ export default function BCSScreen({ route, navigation }) {
     const bcsScore = calculateBCS();
     const alertInfo = getBCSAlert(bcsScore);
     setSaving(true);
-
+    const dataToSave = {
+      horseId,
+      userId: user.uid,
+      scores,
+      bcsScore,
+      alertLevel: alertInfo.level,
+      createdAt: serverTimestamp(),
+    };
+    console.log('[BCS] Dati da salvare:', dataToSave);
     try {
-      await addDoc(collection(db, 'bcsMeasurements'), {
-        horseId,
-        userId: user.uid,
-        scores,
-        bcsScore,
-        alertLevel: alertInfo.level,
-        createdAt: serverTimestamp(),
-      });
+      await addDoc(collection(db, 'bcsMeasurements'), dataToSave);
       setResult({ bcsScore, alert: alertInfo });
     } catch (error) {
       const msg = 'Errore nel salvataggio. Riprova.';
       if (Platform.OS === 'web') { window.alert(msg); } else { Alert.alert('Errore', msg); }
+      console.error('[BCS] Errore salvataggio:', error);
     } finally {
       setSaving(false);
     }

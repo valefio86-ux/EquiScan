@@ -21,6 +21,9 @@ import HGSScreen from './src/screens/HGSScreen';
 import HGSHistoryScreen from './src/screens/HGSHistoryScreen';
 import BorborigmiScreen from './src/screens/BorborigmiScreen';
 import BorborigmiHistoryScreen from './src/screens/BorborigmiHistoryScreen';
+import DietaForaggioScreen from './src/screens/DietaForaggioScreen';
+import DietaMenuScreen from './src/screens/DietaMenuScreen';
+import DietaHistoryScreen from './src/screens/DietaHistoryScreen';
 
 const AuthStack = createNativeStackNavigator();
 const AppStack = createNativeStackNavigator();
@@ -51,6 +54,9 @@ function AppNavigator() {
       <AppStack.Screen name="HGSHistory" component={HGSHistoryScreen} options={{ title: 'Storico HGS' }} />
       <AppStack.Screen name="Borborigmi" component={BorborigmiScreen} options={{ title: 'Borborigmi' }} />
       <AppStack.Screen name="BorborigmiHistory" component={BorborigmiHistoryScreen} options={{ title: 'Storico Borborigmi' }} />
+      <AppStack.Screen name="DietaForaggio" component={DietaForaggioScreen} options={{ title: 'Foraggio' }} />
+      <AppStack.Screen name="DietaMenu" component={DietaMenuScreen} options={{ title: 'Gestione Dieta' }} />
+      <AppStack.Screen name="DietaHistory" component={DietaHistoryScreen} options={{ title: 'Storico Dieta' }} />
     </AppStack.Navigator>
   );
 }

@@ -145,25 +145,24 @@ export default function HGSScreen({ route, navigation }) {
   // ── Calcola e salva ──
   const handleSave = async () => {
     setSaving(true);
+    const total = Object.values(scores).reduce((sum, v) => sum + v, 0);
+    const alert = getHGSAlert(total);
+    const dataToSave = {
+      horseId,
+      userId: user.uid,
+      scores,
+      hgsScore: total,
+      alertLevel: alert.level,
+      createdAt: serverTimestamp(),
+    };
+    console.log('[HGS] Dati da salvare:', dataToSave);
     try {
-      const total = Object.values(scores).reduce((sum, v) => sum + v, 0);
-      const alert = getHGSAlert(total);
-
-      // Salva su Firestore (foto resta solo sul dispositivo)
-      await addDoc(collection(db, 'hgsMeasurements'), {
-        horseId,
-        userId: user.uid,
-        scores,
-        hgsScore: total,
-        alertLevel: alert.level,
-        createdAt: serverTimestamp(),
-      });
-
+      await addDoc(collection(db, 'hgsMeasurements'), dataToSave);
       setHgsScore(total);
       setAlertInfo(alert);
       setPhase('result');
     } catch (error) {
-      console.error('Errore salvataggio HGS:', error);
+      console.error('[HGS] Errore salvataggio:', error);
       if (Platform.OS === 'web') {
         window.alert('Errore nel salvataggio. Riprova.');
       } else {

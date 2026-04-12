@@ -158,25 +158,25 @@ export default function BorborigmiScreen({ route, navigation }) {
   // ── Salva ──
   const handleSave = async () => {
     setSaving(true);
+    const total = Object.values(scores).reduce((sum, v) => sum + v, 0);
+    const alert = getBorborigmiAlert(scores);
+    const dataToSave = {
+      horseId,
+      userId: user.uid,
+      scores,
+      totalScore: total,
+      alertLevel: alert.level,
+      hasAudio: !!recordingUri,
+      createdAt: serverTimestamp(),
+    };
+    console.log('[Borborigmi] Dati da salvare:', dataToSave);
     try {
-      const total = Object.values(scores).reduce((sum, v) => sum + v, 0);
-      const alert = getBorborigmiAlert(scores);
-
-      await addDoc(collection(db, 'borborigmiMeasurements'), {
-        horseId,
-        userId: user.uid,
-        scores,
-        totalScore: total,
-        alertLevel: alert.level,
-        hasAudio: !!recordingUri,
-        createdAt: serverTimestamp(),
-      });
-
+      await addDoc(collection(db, 'borborigmiMeasurements'), dataToSave);
       setTotalScore(total);
       setAlertInfo(alert);
       setPhase('result');
     } catch (error) {
-      console.error('Errore salvataggio:', error);
+      console.error('[Borborigmi] Errore salvataggio:', error);
       if (Platform.OS === 'web') {
         window.alert('Errore nel salvataggio. Riprova.');
       } else {

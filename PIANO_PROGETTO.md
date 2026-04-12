@@ -443,14 +443,15 @@ Ogni fase viene completata e testata prima di passare alla successiva.
 
 ---
 
+
 ### FASE 7 — Borborigmi
-- [ ] Step 7.1: Sagoma fianco cavallo con 4 quadranti cliccabili
-- [ ] Step 7.2: Interfaccia valutazione per quadrante (scala 0-3)
-- [ ] Step 7.3: Registrazione audio opzionale (10 secondi)
+- [x] Step 7.1: Sagoma fianco cavallo con 4 quadranti cliccabili
+- [x] Step 7.2: Interfaccia valutazione per quadrante (scala 0-3)
+- [x] Step 7.3: Registrazione audio opzionale (10 secondi)
 - [ ] Step 7.4: Salvataggio audio su Firebase Storage
-- [ ] Step 7.5: Logica alert incrociati (Rosso/Arancione/Giallo)
-- [ ] Step 7.6: Storico auscultazioni
-- [ ] 🧪 **TEST:** Valutazione 4 quadranti, registrazione audio, alert incrociati
+- [x] Step 7.5: Logica alert incrociati (Rosso/Arancione/Giallo)
+- [x] Step 7.6: Storico auscultazioni
+- [x] 🧪 **TEST:** Valutazione 4 quadranti, registrazione audio, alert incrociati
 
 ---
 

@@ -15,7 +15,7 @@ const MODULES = [
   { key: 'bcs', icon: '⚖️', title: 'Body Condition', unit: '/9', phase: 5, screen: 'BCS' },
   { key: 'pain', icon: '😣', title: 'Scala Dolore', unit: '/12', phase: 6, screen: 'HGS' },
   { key: 'gut', icon: '🔊', title: 'Borborigmi', unit: '/12', phase: 7, screen: 'Borborigmi' },
-  { key: 'diet', icon: '🥕', title: 'Dieta', unit: '', phase: 8, screen: null },
+  { key: 'diet', icon: '🥕', title: 'Dieta', unit: '', phase: 8, screen: 'DietaMenu' },
 ];
 
 export default function DashboardScreen({ route, navigation }) {

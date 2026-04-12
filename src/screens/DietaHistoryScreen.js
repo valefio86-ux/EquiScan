@@ -180,6 +180,44 @@ export default function DietaHistoryScreen({ route }) {
           </TouchableOpacity>
         ))}
       </View>
+      {/* Tabella e consigli pratici per Variazioni */}
+      {filtro === 'variazioni' && (
+        <View style={{ marginBottom: 24 }}>
+          <Text style={{ fontWeight: 'bold', marginBottom: 8 }}>
+            Il passaggio deve avvenire in modo incrementale nell'arco di almeno <Text style={{ fontWeight: 'bold', textDecorationLine: 'underline' }}>10 giorni</Text>:
+          </Text>
+          <View style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 8, overflow: 'hidden', marginBottom: 12 }}>
+            <View style={{ flexDirection: 'row', backgroundColor: '#f5f5f5' }}>
+              <Text style={{ flex: 1, fontWeight: 'bold', padding: 6, textAlign: 'center' }}>Giorni</Text>
+              <Text style={{ flex: 1, fontWeight: 'bold', padding: 6, textAlign: 'center' }}>Vecchio Cibo (Fieno/Mangime)</Text>
+              <Text style={{ flex: 1, fontWeight: 'bold', padding: 6, textAlign: 'center' }}>Nuovo Cibo (Fieno/Mangime)</Text>
+            </View>
+            <View style={{ flexDirection: 'row', borderTopWidth: 1, borderColor: '#eee' }}>
+              <Text style={{ flex: 1, padding: 6, textAlign: 'center' }}>1 - 3</Text>
+              <Text style={{ flex: 1, padding: 6, textAlign: 'center' }}>75%</Text>
+              <Text style={{ flex: 1, padding: 6, textAlign: 'center' }}>25%</Text>
+            </View>
+            <View style={{ flexDirection: 'row', borderTopWidth: 1, borderColor: '#eee' }}>
+              <Text style={{ flex: 1, padding: 6, textAlign: 'center' }}>4 - 6</Text>
+              <Text style={{ flex: 1, padding: 6, textAlign: 'center' }}>50%</Text>
+              <Text style={{ flex: 1, padding: 6, textAlign: 'center' }}>50%</Text>
+            </View>
+            <View style={{ flexDirection: 'row', borderTopWidth: 1, borderColor: '#eee' }}>
+              <Text style={{ flex: 1, padding: 6, textAlign: 'center' }}>7 - 9</Text>
+              <Text style={{ flex: 1, padding: 6, textAlign: 'center' }}>25%</Text>
+              <Text style={{ flex: 1, padding: 6, textAlign: 'center' }}>75%</Text>
+            </View>
+            <View style={{ flexDirection: 'row', borderTopWidth: 1, borderColor: '#eee' }}>
+              <Text style={{ flex: 1, padding: 6, textAlign: 'center' }}>Dal 10°</Text>
+              <Text style={{ flex: 1, padding: 6, textAlign: 'center' }}>0%</Text>
+              <Text style={{ flex: 1, padding: 6, textAlign: 'center' }}>100%</Text>
+            </View>
+          </View>
+          <Text style={{ fontWeight: 'bold', marginBottom: 4 }}>Consigli Pratici</Text>
+          <Text style={{ marginBottom: 2 }}>• Non cambiare mai due cose insieme: se devi cambiare sia il fieno che il mangime, fallo in due momenti diversi (prima uno, poi l'altro a distanza di due settimane).</Text>
+          <Text>• Piccoli pasti, frequenti: lo stomaco del cavallo è piccolo (circa 8-15 litri). Dividere la razione di concentrato in più somministrazioni giornaliere riduce il rischio di acidosi.</Text>
+        </View>
+      )}
       {loading ? <ActivityIndicator color={COLORS.primary} /> : (
         filtered.length === 0 ? (
           <View style={styles.emptyBox}>

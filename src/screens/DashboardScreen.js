@@ -17,6 +17,7 @@ const MODULES = [
   { key: 'pain', icon: '😣', title: 'Scala Dolore', unit: '/12', phase: 6, screen: 'HGS' },
   { key: 'gut', icon: '🔊', title: 'Borborigmi', unit: '/12', phase: 7, screen: 'Borborigmi' },
   { key: 'diet', icon: '🥕', title: 'Dieta', unit: '', phase: 8, screen: 'DietaMenu' },
+  { key: 'variazioni', icon: '🔄', title: 'Variazioni', unit: '', phase: 8, screen: 'DietaMenu' },
 ];
 
 export default function DashboardScreen({ route, navigation }) {
@@ -29,6 +30,10 @@ export default function DashboardScreen({ route, navigation }) {
   const [dietaMsg, setDietaMsg] = useState('');
   const [dietaColor, setDietaColor] = useState(COLORS.success);
   const [dietaDetails, setDietaDetails] = useState([]);
+  const [variazioniScore, setVariazioniScore] = useState(null);
+  const [variazioniMsg, setVariazioniMsg] = useState('');
+  const [variazioniColor, setVariazioniColor] = useState(COLORS.success);
+  const [variazioniDebug, setVariazioniDebug] = useState(null);
 
   useEffect(() => {
     const unsubscribe = onSnapshot(doc(db, 'horses', horseId), (snap) => {
@@ -233,6 +238,35 @@ export default function DashboardScreen({ route, navigation }) {
       setDietaDetails(details);
     };
     fetchDieta();
+    // Variazioni
+    const fetchVariazioni = async () => {
+      let score = 2;
+      let msg = 'OK';
+      let color = COLORS.success;
+      try {
+        const vq = query(
+          collection(db, 'dietaVariazioni'),
+          where('horseId', '==', horseId),
+          where('userId', '==', user.uid),
+          orderBy('createdAt', 'desc'),
+          limit(1)
+        );
+        const snap = await getDocs(vq);
+        if (!snap.empty) {
+          // Almeno una variazione: semaforo rosso
+          score = 0; msg = 'Critico'; color = COLORS.error;
+        } else {
+          // Nessuna variazione: semaforo verde
+          score = 2; msg = 'OK'; color = COLORS.success;
+        }
+      } catch {
+        score = 2; msg = 'OK'; color = COLORS.success;
+      }
+      setVariazioniScore(score);
+      setVariazioniMsg(msg);
+      setVariazioniColor(color);
+    };
+    fetchVariazioni();
   }, [horseId, user]);
 
   useFocusEffect(
@@ -357,7 +391,33 @@ export default function DashboardScreen({ route, navigation }) {
       {/* Card parametri */}
       <Text style={styles.sectionTitle}>Parametri</Text>
       <View style={styles.cardsGrid}>
-        {MODULES.map((mod) => (
+        {/* Bottone Dieta */}
+        <TouchableOpacity
+          key="diet"
+          style={[styles.card, styles.cardActive]}
+          activeOpacity={0.7}
+          onPress={() => navigation.navigate('DietaMenu', { horseId: horse.id })}
+        >
+          <Text style={styles.cardIcon}>🥕</Text>
+          <Text style={styles.cardTitle}>Dieta</Text>
+          <Text style={{ fontWeight: 'bold', color: dietaColor, fontSize: 18, marginBottom: 2 }}>{dietaMsg}</Text>
+          {dietaMsg === 'Attenzione' || dietaMsg === 'Critico' ? (
+            <Text style={[styles.cardStatus, { color: dietaColor }]}>Problema: {dietaDetails?.join(', ')}</Text>
+          ) : null}
+        </TouchableOpacity>
+        {/* Bottone Variazioni dieta */}
+        <TouchableOpacity
+          key="variazioni"
+          style={[styles.card, styles.cardActive]}
+          activeOpacity={0.7}
+          onPress={() => navigation.navigate('DietaMenu', { horseId: horse.id, tab: 'variazioni' })}
+        >
+          <Text style={styles.cardIcon}>🔄</Text>
+          <Text style={styles.cardTitle}>Variazioni dieta</Text>
+          <Text style={{ fontWeight: 'bold', color: variazioniColor, fontSize: 18, marginBottom: 2 }}>{variazioniMsg}</Text>
+        </TouchableOpacity>
+        {/* Altri moduli */}
+        {MODULES.filter(mod => mod.key !== 'diet' && mod.key !== 'variazioni').map((mod) => (
           <TouchableOpacity
             key={mod.key}
             style={[styles.card, mod.screen && styles.cardActive]}
@@ -366,21 +426,10 @@ export default function DashboardScreen({ route, navigation }) {
           >
             <Text style={styles.cardIcon}>{mod.icon}</Text>
             <Text style={styles.cardTitle}>{mod.title}</Text>
-            {mod.key === 'diet' ? (
-              <>
-                <Text style={{ fontWeight: 'bold', color: dietaColor, fontSize: 18, marginBottom: 2 }}>{dietaMsg}</Text>
-                {dietaMsg === 'Attenzione' || dietaMsg === 'Critico' ? (
-                  <Text style={[styles.cardStatus, { color: dietaColor }]}>Problema: {dietaDetails?.join(', ')}</Text>
-                ) : null}
-              </>
-            ) : (
-              <>
-                <Text style={[styles.cardValue, latestValues[mod.key] != null && { color: getStatusColor(mod) }]}>
-                  {getCardValue(mod)}{latestValues[mod.key] != null ? ` ${mod.unit}` : ''}
-                </Text>
-                <Text style={[styles.cardStatus, { color: getStatusColor(mod) }]}>{getCardStatus(mod)}</Text>
-              </>
-            )}
+            <Text style={[styles.cardValue, latestValues[mod.key] != null && { color: getStatusColor(mod) }]}>
+              {getCardValue(mod)}{latestValues[mod.key] != null ? ` ${mod.unit}` : ''}
+            </Text>
+            <Text style={[styles.cardStatus, { color: getStatusColor(mod) }]}>{getCardStatus(mod)}</Text>
           </TouchableOpacity>
         ))}
       </View>

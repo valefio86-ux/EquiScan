@@ -1,3 +1,14 @@
+---
+
+### FASE 17 — Separazione dati di test e dati reali
+- [ ] Step 17.1: Aggiunta campo `isTestData` a tutte le collezioni di misurazioni (Firestore)
+- [ ] Step 17.2: Opzione “Developer Mode” nelle impostazioni (attivabile/disattivabile, anche nascosta)
+- [ ] Step 17.3: Quando Developer Mode è attiva, tutti i dati inseriti hanno `isTestData: true`
+- [ ] Step 17.4: Filtri automatici in dashboard/statistiche: vengono mostrati solo i dati con `isTestData: false`
+- [ ] Step 17.5: Documentazione per la tesi: come sono stati separati i dati di test da quelli reali
+- [ ] 🧪 **TEST:** Verifica inserimento, filtro e pulizia dati di test
+
+> Questa fase garantisce che i dati di test non inquinino le statistiche reali e rende la tesi più rigorosa e trasparente.
 # 📋 PIANO PROGETTO — EquiScan
 
 **Sistema di Monitoraggio Predittivo Equino**
@@ -383,44 +394,44 @@ Ogni fase viene completata e testata prima di passare alla successiva.
 - [x] Step 1.3: Funzione "Password dimenticata"
 - [x] Step 1.4: Protezione delle schermate (solo utenti loggati)
 - [x] Step 1.5: Pulsante Logout
-- [ ] 🧪 **TEST:** Registrazione, login, logout, recupero password
+- [x] 🧪 **TEST:** Registrazione, login, logout, recupero password
 
 ---
 
-### FASE 2 — Profilo Cavallo
-- [ ] Step 2.1: Schermata Lista Cavalli (con tasto "Aggiungi cavallo")
-- [ ] Step 2.2: Form creazione cavallo (dati identificativi)
-- [ ] Step 2.3: Form dati biometrici (peso, altezza, età)
-- [ ] Step 2.4: Form profilo sanitario pregresso
-- [ ] Step 2.5: Form scadenze routine (sverminazione, dentista)
-- [ ] Step 2.6: Modifica e eliminazione cavallo
-- [ ] Step 2.7: Struttura dati Firestore (collezioni e documenti)
-- [ ] 🧪 **TEST:** Creare, modificare, eliminare un cavallo. Verificare i dati su Firebase.
+### FASE 2 — Profilo Cavallo ✅
+- [x] Step 2.1: Schermata Lista Cavalli (con tasto "Aggiungi cavallo")
+- [x] Step 2.2: Form creazione cavallo (dati identificativi)
+- [x] Step 2.3: Form dati biometrici (peso, altezza, età)
+- [x] Step 2.4: Form profilo sanitario pregresso
+- [x] Step 2.5: Form scadenze routine (sverminazione, dentista)
+- [x] Step 2.6: Modifica e eliminazione cavallo
+- [x] Step 2.7: Struttura dati Firestore (collezioni e documenti)
+- [x] 🧪 **TEST:** Creare, modificare, eliminare un cavallo. Verificare i dati su Firebase.
 
 ---
 
-### FASE 3 — Dashboard
-- [ ] Step 3.1: Layout dashboard con Gauge circolare
-- [ ] Step 3.2: Card riassuntive per ogni parametro
-- [ ] Step 3.3: Selettore cavallo (se più di uno)
-- [ ] Step 3.4: Collegamento dati reali dai moduli (inizialmente vuoti)
-- [ ] 🧪 **TEST:** Visualizzazione corretta, cambio cavallo
+### FASE 3 — Dashboard ✅
+- [x] Step 3.1: Layout dashboard con Gauge circolare
+- [x] Step 3.2: Card riassuntive per ogni parametro
+- [x] Step 3.3: Selettore cavallo (se più di uno)
+- [x] Step 3.4: Collegamento dati reali dai moduli (inizialmente vuoti)
+- [x] 🧪 **TEST:** Visualizzazione corretta, cambio cavallo
 
 ---
 
-### FASE 4 — Monitoraggio Cardiaco
-- [ ] Step 4.1: Schermata con istruzioni per l'utente
-- [ ] Step 4.2: Tasto TAP grande + timer 15 secondi
-- [ ] Step 4.3: Calcolo BPM (tocchi × 4)
-- [ ] Step 4.4: Salvataggio misurazione su Firestore
-- [ ] Step 4.5: Calcolo baseline automatico (media ultime N misurazioni)
-- [ ] Step 4.6: Logica alert (4 livelli: Verde, Giallo, Arancione, Rosso)
-- [ ] Step 4.7: Storico misurazioni con grafico
-- [ ] 🧪 **TEST:** Simulare misurazioni, verificare calcolo BPM, alert, baseline
+### FASE 4 — Monitoraggio Cardiaco ✅
+- [x] Step 4.1: Schermata con istruzioni per l'utente
+- [x] Step 4.2: Tasto TAP grande + timer 15 secondi
+- [x] Step 4.3: Calcolo BPM (tocchi × 4)
+- [x] Step 4.4: Salvataggio misurazione su Firestore
+- [x] Step 4.5: Calcolo baseline automatico (media ultime N misurazioni)
+- [x] Step 4.6: Logica alert (4 livelli: Verde, Giallo, Arancione, Rosso)
+- [x] Step 4.7: Storico misurazioni con grafico
+- [x] 🧪 **TEST:** Simulare misurazioni, verificare calcolo BPM, alert, baseline
 
 ---
 
-### FASE 5 — BCS Interattivo
+### FASE 5 — BCS Interattivo ✅
 - [x] Step 5.1: Sagoma cavallo con 6 zone cliccabili
 - [x] Step 5.2: Domande guidate per ogni zona
 - [x] Step 5.3: Immagini di riferimento per ogni zona
@@ -431,7 +442,7 @@ Ogni fase viene completata e testata prima di passare alla successiva.
 
 ---
 
-### FASE 6 — Horse Grimace Scale
+### FASE 6 — Horse Grimace Scale ✅
 - [x] Step 6.1: Guida scatto foto (istruzioni posizionamento)
 - [x] Step 6.2: Cattura foto con fotocamera del telefono
 - [x] Step 6.3: Visualizzazione foto + checklist 6 Action Units

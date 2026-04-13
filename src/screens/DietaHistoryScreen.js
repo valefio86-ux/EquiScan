@@ -80,6 +80,13 @@ export default function DietaHistoryScreen({ route }) {
   const recConcentrati = records.find(r => r.categoria === 'concentrati');
   let colorConcentrati = '#388e3c';
   if (!recConcentrati || !recConcentrati.quantita) colorConcentrati = '#b71c1c';
+  // ALERT: pasto concentrati > 2.5 kg
+  // Cerca tutti i pasti di concentrati e verifica se qualcuno supera 2.5 kg
+  const pastiConcentrati = records.filter(r => r.categoria === 'concentrati' && r.quantita);
+  const pastiTroppoGrandi = pastiConcentrati.filter(r => parseFloat(r.quantita) > 2.5);
+  if (pastiTroppoGrandi.length > 0) {
+    alertDieta.push('Attenzione: uno o più pasti di concentrati superano i 2,5 kg. Suddividere la razione in più pasti per ridurre il rischio di coliche, acidosi e laminite.');
+  }
   // Idratazione
   const recIdratazione = records.find(r => r.categoria === 'idratazione');
   let colorIdratazione = '#388e3c';

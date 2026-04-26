@@ -1,14 +1,4 @@
----
 
-### FASE 17 — Separazione dati di test e dati reali
-- [ ] Step 17.1: Aggiunta campo `isTestData` a tutte le collezioni di misurazioni (Firestore)
-- [ ] Step 17.2: Opzione “Developer Mode” nelle impostazioni (attivabile/disattivabile, anche nascosta)
-- [ ] Step 17.3: Quando Developer Mode è attiva, tutti i dati inseriti hanno `isTestData: true`
-- [ ] Step 17.4: Filtri automatici in dashboard/statistiche: vengono mostrati solo i dati con `isTestData: false`
-- [ ] Step 17.5: Documentazione per la tesi: come sono stati separati i dati di test da quelli reali
-- [ ] 🧪 **TEST:** Verifica inserimento, filtro e pulizia dati di test
-
-> Questa fase garantisce che i dati di test non inquinino le statistiche reali e rende la tesi più rigorosa e trasparente.
 # 📋 PIANO PROGETTO — EquiScan
 
 **Sistema di Monitoraggio Predittivo Equino**
@@ -557,7 +547,17 @@ Ogni fase viene completata e testata prima di passare alla successiva.
 - [ ] 🧪 **TEST:** Simulare variazione dieta, check giornalieri, verifica logica semaforo e notifiche
 
 > Questa fase trasforma il semaforo Variazioni in uno strumento clinico attivo, responsabilizzando l’utente e valorizzando i moduli HGS e borborigmi.
+---
 
+### FASE 17 — Separazione dati di test e dati reali
+- [ ] Step 17.1: Aggiunta campo `isTestData` a tutte le collezioni di misurazioni (Firestore)
+- [ ] Step 17.2: Opzione "Developer Mode" nelle impostazioni (attivabile/disattivabile, anche nascosta)
+- [ ] Step 17.3: Quando Developer Mode è attiva, tutti i dati inseriti hanno `isTestData: true`
+- [ ] Step 17.4: Filtri automatici in dashboard/statistiche: vengono mostrati solo i dati con `isTestData: false`
+- [ ] Step 17.5: Documentazione per la tesi: come sono stati separati i dati di test da quelli reali
+- [ ] 🧪 **TEST:** Verifica inserimento, filtro e pulizia dati di test
+
+> Questa fase garantisce che i dati di test non inquinino le statistiche reali e rende la tesi più rigorosa e trasparente.
 ## ⚖️ Note Legali e Accademiche
 
 - **Privacy by Design:** i dati dei cavalli sono separati dalle anagrafiche dei proprietari
